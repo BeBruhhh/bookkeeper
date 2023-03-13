@@ -4,11 +4,14 @@
 
 from bookkeeper.models.category import Category
 from bookkeeper.models.expense import Expense
+from bookkeeper.models.budget import Budget
 from bookkeeper.repository.memory_repository import MemoryRepository
+from bookkeeper.repository.sqlite_repository import SQLiteRepository
 from bookkeeper.utils import read_tree
 
-cat_repo = MemoryRepository[Category]()
-exp_repo = MemoryRepository[Expense]()
+cat_repo = SQLiteRepository[Category]('main_db.db', Category)
+exp_repo = SQLiteRepository[Expense]('main_db.db', Expense)
+bud_repo = SQLiteRepository[Budget]('main_db.db', Budget)
 
 cats = '''
 продукты
@@ -20,7 +23,7 @@ cats = '''
 одежда
 '''.splitlines()
 
-Category.create_from_tree(read_tree(cats), cat_repo)
+# Category.create_from_tree(read_tree(cats), cat_repo)
 
 while True:
     try:
@@ -29,9 +32,9 @@ while True:
         break
     if not cmd:
         continue
-    if cmd == 'категории':
+    if cmd == 'categories':
         print(*cat_repo.get_all(), sep='\n')
-    elif cmd == 'расходы':
+    elif cmd == 'expenses':
         print(*exp_repo.get_all(), sep='\n')
     elif cmd[0].isdecimal():
         amount, name = cmd.split(maxsplit=1)
